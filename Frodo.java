@@ -13,6 +13,7 @@ import java.security.SecureRandom;
 import javax.crypto.KeyGenerator;
 
 import java.nio.file.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -48,7 +49,8 @@ public class Frodo
         throws GeneralSecurityException
     {
 	//test();
-        testLiboqs("/home/kxie/Desktop/bc-frodom-publickey.txt");
+        //testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_public_key.txt");
+        testLiboqs2();
     }
 
     public static KeyPair frodoGenerateKeyPair(FrodoParameterSpec frodoParameters) throws GeneralSecurityException
@@ -195,6 +197,8 @@ public class Frodo
 	}
     }
 
+    // liboqs writes public key to file, bouncycastle reads public key,
+    // encaps with the public key, writes the cipher text to file for liboqs to decap.
     public static boolean testLiboqs(String publicKeyFileName) {
         PublicKey publicKey = readFrodoPublicKeyFromFile(publicKeyFileName);
 	if (publicKey == null) {
@@ -203,9 +207,35 @@ public class Frodo
         }
         try {
             SecretKeyWithEncapsulation secEnc1 = frodoGeneratePartyU(publicKey);
-	    writeByteArrayToFile(secEnc1.getEncapsulation(), "/home/kxie/Desktop/bc-frodo-ciphertext.txt");
+	    writeByteArrayToFile(secEnc1.getEncapsulation(), "/home/kxie/Desktop/oqs-bc/bc_cipher_text.txt");
+	    System.out.println("Shared secret:" + Hex.toHexString(secEnc1.getEncoded()));
 	    return true;
 	} catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // bouncy castle writes the public key to file, liboqs encaps with the public key
+    // reads the cipher text from liboqs, and decaps the cipher text.
+    public static boolean testLiboqs2() {
+        try {
+            KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem19888r3); // FrodoKEM-640-AEM, cipher text size: 9720, AES keysize: 16, public key length: 9644, private key length: 19918
+            byte[] rawKey = ((FrodoPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getPublicKey();
+            writeByteArrayToFile(rawKey, "/home/kxie/Desktop/oqs-bc/bc_public_key.txt");
+            File file = new File("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
+            while (!file.exists()) {
+                System.out.println("File /home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt is not ready, wait 1 minute");
+                Thread.sleep(1000 * 60); // sleep 1 minute
+                file = new File("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
+            }
+            byte[] cipher = readByteArrayFromFile("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
+	    System.out.println("cipher text size:" + cipher.length);
+            SecretKeyWithEncapsulation decap = frodoGeneratePartyV(kp.getPrivate(), cipher);
+	    System.out.println("Shared secret:" + Hex.toHexString(decap.getEncoded()));
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception in testLiboqs2)");
             e.printStackTrace();
             return false;
         }
