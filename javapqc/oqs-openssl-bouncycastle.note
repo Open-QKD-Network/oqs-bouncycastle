@@ -1,0 +1,25 @@
+1. javapqc/post quantum openssl client 
+1.1  run.sh
+1.2 post quantum openssl
+1.2.1 cd open-quantum-safe
+1.2.2 export LD_LIBRARY_PATH=/home/kxie/open-quantum-safe/openssl-install/openssl/lib/
+1.2.3 openssl-install/openssl/bin/openssl s_client -groups X25519 -CAfile springboot-demo-cert.pem
+2. javapqc client and server, change the code
+3. Spring boot example/post quantum openssl client
+3.1 Run spring boot
+ kxie@kxie-ubuntu-20:~/github-kaiduanx/springboot-tls/example-1$ pwd
+/home/kxie/github-kaiduanx/springboot-tls/example-1
+
+./run.sh
+
+3.2 kxie@kxie-ubuntu-20:~/open-quantum-safe$ openssl-install/openssl/bin/openssl s_client -groups X25519 -CAfile springboot-demo-cert.pem  -connect 127.0.0.1:8080
+
+4. Build openssl with post quantum
+4.1.1 git checkout openssl
+4.1.2 git checkout liboqs
+4.1.3 cd liboqs, mkdir build, cd build
+cmake -GNinja -DCMAKE_INSTALL_PREFIX=../../openssl/oqs ..
+4.2 cd post-quantum-safe/openssl
+4.2.1 ./Configure shared linux-x86_64 --debug --prefix=/home/kxie/open-quantum-safe/openssl-install/openssl --openssldir=/home/kxie/open-quantum-safe/openssl-install/ssl -DOQS_DEFAULT_GROUPS=\"p256_frodo640aes:X25519\" -lm
+4.2.2 make
+4.3.3 make install
