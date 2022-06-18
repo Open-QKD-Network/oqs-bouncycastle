@@ -23,3 +23,12 @@ cmake -GNinja -DCMAKE_INSTALL_PREFIX=../../openssl/oqs ..
 4.2.1 ./Configure shared linux-x86_64 --debug --prefix=/home/kxie/open-quantum-safe/openssl-install/openssl --openssldir=/home/kxie/open-quantum-safe/openssl-install/ssl -DOQS_DEFAULT_GROUPS=\"p256_frodo640aes:X25519\" -lm
 4.2.2 make
 4.3.3 make install
+
+5. Convert pkcs12 to PEM
+https://stackoverflow.com/questions/15144046/converting-pkcs12-certificate-into-pem-using-openssl
+openssl pkcs12 -in path.p12 -out newfile.crt.pem -clcerts -nokeys
+openssl pkcs12 -in path.p12 -out newfile.key.pem -nocerts -nodes
+
+6. Generate self-signed pkcs12 certificate for SpringBoot
+https://codersathi.com/how-to-use-self-signed-ssl-certificate-in-spring-boot-application/
+keytool -genkeypair -alias demo -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore demo.p12 -validity 3650
