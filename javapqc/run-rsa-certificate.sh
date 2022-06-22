@@ -1,0 +1,1 @@
+java -Djava.util.logging.config.file=logging.properties -Djavax.net.ssl.keyStore=demo.p12 -Djavax.net.ssl.keyStorePassword=123456 -Djavax.net.ssl.trustStoreProvider="BC" -Djavax.net.ssl.trustStore=demo.p12 -Djavax.net.ssl.trustStorePassword=123456 -cp target/javapqc-0.0.1-SNAPSHOT.jar:../../lib/* com.goodstartsoft.pqc.Pqc

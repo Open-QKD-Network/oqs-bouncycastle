@@ -48,7 +48,7 @@ public class Pqc {
             new Thread(server).start();
             Thread.sleep(delay);
 
-            /*try (SSLSocket socket = createSocket("localhost", server.port())) {
+            try (SSLSocket socket = createSocket("localhost", server.port())) {
                 InputStream is = new BufferedInputStream(socket.getInputStream());
                 OutputStream os = new BufferedOutputStream(socket.getOutputStream());
                 os.write(message.getBytes());
@@ -60,7 +60,7 @@ public class Pqc {
                 }
                 System.out.printf("client received %d bytes: %s%n",
                         len, new String(data, 0, len));
-            }*/
+            }
 	    while (true) {
 	    }
         }
