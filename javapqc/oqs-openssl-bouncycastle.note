@@ -32,3 +32,9 @@ openssl pkcs12 -in path.p12 -out newfile.key.pem -nocerts -nodes
 6. Generate self-signed pkcs12 certificate for SpringBoot
 https://codersathi.com/how-to-use-self-signed-ssl-certificate-in-spring-boot-application/
 keytool -genkeypair -alias demo -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore demo.p12 -validity 3650
+
+7. export certificate from keystore
+keytool -export -alias identity -file cert.p12 -keystore ~/Desktop/identity.p12 -storetype PKCS12
+openssl pkcs12 -in ~/Desktop/identity.p12 -out ~/Desktop/cert.pem -clcerts -nokeys
+Run openssl as client.
+openssl-install/openssl/bin/openssl s_client -CAfile ~/Desktop/cert.pem -connect 127.0.0.1:8080
