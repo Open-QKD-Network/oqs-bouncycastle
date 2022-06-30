@@ -36,5 +36,12 @@ keytool -genkeypair -alias demo -keyalg RSA -keysize 2048 -storetype PKCS12 -key
 7. export certificate from keystore
 keytool -export -alias identity -file cert.p12 -keystore ~/Desktop/identity.p12 -storetype PKCS12
 openssl pkcs12 -in ~/Desktop/identity.p12 -out ~/Desktop/cert.pem -clcerts -nokeys
-Run openssl as client.
+8. Java tls-server/openssl client
+8.1 Run java as tls-server.
+cd open-quantum-safe/oqs-bouncycastle/javapqc
+./run-tls-server.sh
+8.2 Run openssl as client.
 openssl-install/openssl/bin/openssl s_client -CAfile ~/Desktop/cert.pem -connect 127.0.0.1:8080
+8.3 Run openssl as client with hybrid key exchange
+openssl-install/openssl/bin/openssl s_client -groups p256_frodo640aes -CAfile ~/Desktop/cert.pem -connect 127.0.0.1:8080 
+
