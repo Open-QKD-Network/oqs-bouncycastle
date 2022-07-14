@@ -45,3 +45,32 @@ openssl-install/openssl/bin/openssl s_client -CAfile ~/Desktop/cert.pem -connect
 8.3 Run openssl as client with hybrid key exchange
 openssl-install/openssl/bin/openssl s_client -groups p256_frodo640aes -CAfile ~/Desktop/cert.pem -connect 127.0.0.1:8080 
 
+OpenSSL server/Java bouncycastle client
+#######################
+1. Java generated certificate/private key in identity.p12 for java server
+
+2. Java generated certificate in trust.p12 for java client
+
+https://www.ssl.com/how-to/export-certificates-private-key-from-pkcs12-file-with-openssl/
+
+3. Extract certificate from identity.p12 to pem file for openssl server use
+
+openssl pkcs12 -in identity.p12 -out identity-cert.pem -nokeys
+
+4. Extract private key from identity.p12 to pem file for openssl server use
+
+openssl pkcs12 -in identity.p12 -out identity-private-key.pem -nodes -nocerts
+
+5. Run openssl server with liboqs
+
+openssl s_server -cert ~/Desktop/identity-cert.pem -key ~/Desktop/identity-private-key.pem -tls1_3 -port 8080
+
+6. Run Java client with bouncy castle
+
+run-tls-client.sh
+
+Run java client and server
+#########################
+run-tls-server.sh
+
+run-tls-client.sh
