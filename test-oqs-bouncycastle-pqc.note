@@ -1,0 +1,39 @@
+1. Build bouncycastle
+
+1.1 git clone https://github.com/Open-QKD-Network/bc-java.git
+
+1.2 cd bc-java
+
+1.3 git checkout openqkd
+
+1.4 sh ./build1-8+
+
+the jar files are generated in build/artifacts/jdk1.8/jars/
+
+2. Build Frodo.java test application
+
+2.1 untar java-crypto-tools-src-openqkd.tar.gz
+2.2 copy Frodo.java to java-crypto-tools-src/gen/src/main/java/chapter15/Frodo.java
+2.3 copy jar files generated in step 1 to java-crypto-tools-src/gen/lib
+2.4 mvn clean package
+
+3. Build liboqs
+
+3.1 git clone https://github.com/open-quantum-safe/liboqs.git
+
+3.2 copy example_kem.c from oqs-bouncycastle/ to tests/example_kem.c
+
+3.3 make
+
+4. Run build/tests/example_kem to generate Frodo public key
+
+5. cd java-crypto-tools-src
+
+5.1 ./run.sh
+
+Shared secret:1b61bdebeb11247e9ac9c3e086a7b6cf
+
+6. We have two tests
+6.1) liboqs generates public key, and bouncycastle reads public key and generates shared secret
+
+6.2) bouncycastle generates public key, and liboqs reads public key and generates shared secret
