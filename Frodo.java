@@ -49,8 +49,8 @@ public class Frodo
         throws GeneralSecurityException
     {
 	//test();
-        //testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_public_key.txt");
-        testLiboqs2();
+        testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_public_key.txt");
+        //testLiboqs2();
     }
 
     public static KeyPair frodoGenerateKeyPair(FrodoParameterSpec frodoParameters) throws GeneralSecurityException
@@ -115,7 +115,7 @@ public class Frodo
         if (key == null) {
             return null;
         }
-        FrodoPublicKeyParameters fpkp = new FrodoPublicKeyParameters(FrodoParameters.frodokem19888r3, key);
+        FrodoPublicKeyParameters fpkp = new FrodoPublicKeyParameters(FrodoParameters.frodokem640aes, key);
         return new BCFrodoPublicKey(fpkp);
     }
     
@@ -124,7 +124,7 @@ public class Frodo
         if (key == null) {
             return null;
         }
-        FrodoPrivateKeyParameters fpkp = new FrodoPrivateKeyParameters(FrodoParameters.frodokem19888r3, key);
+        FrodoPrivateKeyParameters fpkp = new FrodoPrivateKeyParameters(FrodoParameters.frodokem640aes, key);
         return new BCFrodoPrivateKey(fpkp);
     }
 
@@ -150,7 +150,7 @@ public class Frodo
     public static void test() {
         try {
             // https://openquantumsafe.org/liboqs/algorithms/kem/frodokem.html
-            KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem19888r3); // FrodoKEM-640-AEM, cipher text size: 9720, AES keysize: 16, public key length: 9644, private key length: 19918
+            KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem640aes); // FrodoKEM-640-AEM, cipher text size: 9720, AES keysize: 16, public key length: 9644, private key length: 19918
             //KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem43088shaker3); // FrodoKEM-1344-SHAKE, cipher text size: 21632, AES keysize: 32
             System.out.println("Frodo public key length: " + kp.getPublic().getEncoded().length + ", format: " + kp.getPublic().getFormat() + ", algorithm: " + kp.getPublic().getAlgorithm());
             //System.out.println("Frodo public key: " + Hex.toHexString(kp.getPublic().getEncoded()));
@@ -171,7 +171,7 @@ public class Frodo
 
             // generate PublicKey from rawKey
             System.out.println("raw public key size: " + rawKey.length);
-            FrodoPublicKeyParameters fpukp = new FrodoPublicKeyParameters(FrodoParameters.frodokem19888r3, rawKey);
+            FrodoPublicKeyParameters fpukp = new FrodoPublicKeyParameters(FrodoParameters.frodokem640aes, rawKey);
             PublicKey puk2 = new BCFrodoPublicKey(fpukp);
             System.out.println("public key match:"  + Arrays.equals(kp.getPublic().getEncoded(), puk2.getEncoded()));
 
@@ -183,7 +183,7 @@ public class Frodo
             rawKey = ((FrodoPrivateKeyParameters) PrivateKeyFactory.createKey(kp.getPrivate().getEncoded())).getPrivateKey();
 	    // generate PrivateKey from rawKey
             System.out.println("raw private key size: " + rawKey.length);
-            FrodoPrivateKeyParameters fprkp = new FrodoPrivateKeyParameters(FrodoParameters.frodokem19888r3, rawKey);
+            FrodoPrivateKeyParameters fprkp = new FrodoPrivateKeyParameters(FrodoParameters.frodokem640aes, rawKey);
             PrivateKey prk2 = new BCFrodoPrivateKey(fprkp);
             System.out.println("private key match:"  + Arrays.equals(kp.getPrivate().getEncoded(), prk2.getEncoded()));
 
@@ -220,7 +220,7 @@ public class Frodo
     // reads the cipher text from liboqs, and decaps the cipher text.
     public static boolean testLiboqs2() {
         try {
-            KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem19888r3); // FrodoKEM-640-AEM, cipher text size: 9720, AES keysize: 16, public key length: 9644, private key length: 19918
+            KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem640aes); // FrodoKEM-640-AEM, cipher text size: 9720, AES keysize: 16, public key length: 9644, private key length: 19918
             byte[] rawKey = ((FrodoPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getPublicKey();
             writeByteArrayToFile(rawKey, "/home/kxie/Desktop/oqs-bc/bc_public_key.txt");
             File file = new File("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
