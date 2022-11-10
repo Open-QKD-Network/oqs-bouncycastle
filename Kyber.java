@@ -129,7 +129,8 @@ public class Kyber
         if (key == null) {
             return null;
         }
-        KyberPrivateKeyParameters fpkp = new KyberPrivateKeyParameters(KyberParameters.kyber512_aes, key, null, null, null, null);
+        byte[] empty = new byte[0];
+        KyberPrivateKeyParameters fpkp = new KyberPrivateKeyParameters(KyberParameters.kyber512_aes, key, empty, empty, empty, empty);
         return new BCKyberPrivateKey(fpkp);
     }
 
@@ -155,8 +156,8 @@ public class Kyber
 
     public static void test() {
         try {
-            // https://openquantumsafe.org/liboqs/algorithms/kem/frodokem.html
-            KeyPair kp = kyberGenerateKeyPair(KyberParameterSpec.kyber512); // Kyber512
+            // https://openquantumsafe.org/liboqs/algorithms/kem/kyber.html
+            KeyPair kp = kyberGenerateKeyPair(KyberParameterSpec.kyber512_aes); // Kyber512_aes
             System.out.println("Kyber public key length: " + kp.getPublic().getEncoded().length + ", format: " + kp.getPublic().getFormat() + ", algorithm: " + kp.getPublic().getAlgorithm());
             //System.out.println("Kyber public key: " + Hex.toHexString(kp.getPublic().getEncoded()));
             System.out.println("Kyber private key length: " + kp.getPrivate().getEncoded().length + ", format: " + kp.getPrivate().getFormat() + ", algorithm: " + kp.getPrivate().getAlgorithm());
@@ -177,7 +178,7 @@ public class Kyber
 
             // generate PublicKey from rawKey
             System.out.println("raw public key size: " + rawKey.length);
-            KyberPublicKeyParameters fpukp = new KyberPublicKeyParameters(KyberParameters.kyber512, rawKey);
+            KyberPublicKeyParameters fpukp = new KyberPublicKeyParameters(KyberParameters.kyber512_aes, rawKey);
             PublicKey puk2 = new BCKyberPublicKey(fpukp);
             System.out.println("public key match:"  + Arrays.equals(kp.getPublic().getEncoded(), puk2.getEncoded()));
 
@@ -189,15 +190,6 @@ public class Kyber
             rawKey = ((KyberPrivateKeyParameters) PrivateKeyFactory.createKey(kp.getPrivate().getEncoded())).getPrivateKey();
 	        // generate PrivateKey from rawKey
             System.out.println("raw private key size: " + rawKey.length);
-            KyberPrivateKeyParameters fprkp = new KyberPrivateKeyParameters(KyberParameters.kyber512, rawKey, null, null, null, null);
-            PrivateKey prk2 = new BCKyberPrivateKey(fprkp);
-            System.out.println("private key match:"  + Arrays.equals(kp.getPrivate().getEncoded(), prk2.getEncoded()));
-
-	        writeByteArrayToFile(rawKey, "/home/kxie/Desktop/bc-kyber-privatekey.txt");
-	        rkey = readByteArrayFromFile("/home/kxie/Desktop/bc-kyber-privatekey.txt");
-            System.out.println("write/read private key match:"  + Arrays.equals(rawKey, rkey));
-
-            testKyberKEM("/home/kxie/Desktop/bc-kyber-publickey.txt", "/home/kxie/Desktop/bc-kyber-privatekey.txt");
         } catch (Exception e) {
             e.printStackTrace();
 	    }

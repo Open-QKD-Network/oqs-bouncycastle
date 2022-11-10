@@ -31,6 +31,7 @@ int writebytearraytofile(uint8_t* buf, int size, const char* filename);
 uint8_t* readbytearrayfromfile(const char* filename, int* size);
 OQS_STATUS test_bouncycastle(void);
 OQS_STATUS test_bouncycastle2(void);
+OQS_STATUS test_kyber(void);
 
 //0123456789abcdef
 uint8_t char2int(char c) {
@@ -250,7 +251,8 @@ static OQS_STATUS example_heap(void) {
 }
 
 int main(void) {
-	if (0) {
+	test_kyber();
+	if (1) {
 	if (example_stack() == OQS_SUCCESS && example_heap() == OQS_SUCCESS) {
 		return EXIT_SUCCESS;
 	} else {
@@ -432,4 +434,54 @@ OQS_STATUS test_bouncycastle2(void) {
 	cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
 	             ciphertext, kem);
 	return OQS_SUCCESS;
+}
+
+OQS_STATUS test_kyber(void) {
+#ifndef OQS_ENABLE_KEM_kyber_512 // if KEM_kyber_512 was not enabled at compile-time
+	printf("[example_stack] OQS_KEM_kyber_512 was not enabled at "
+	       "compile-time.\n");
+	return OQS_ERROR;
+#else
+	uint8_t public_key[OQS_KEM_kyber_512_length_public_key];
+	uint8_t secret_key[OQS_KEM_kyber_512_length_secret_key];
+	uint8_t ciphertext[OQS_KEM_kyber_512_length_ciphertext];
+	uint8_t shared_secret_e[OQS_KEM_kyber_512_length_shared_secret];
+	uint8_t shared_secret_d[OQS_KEM_kyber_512_length_shared_secret];
+	char *secret_key_hex;
+
+	OQS_STATUS rc = OQS_KEM_kyber_512_keypair(public_key, secret_key);
+	if (rc != OQS_SUCCESS) {
+		fprintf(stderr, "ERROR: OQS_KEM_kyber_512_keypair failed!\n");
+		cleanup_stack(secret_key, OQS_KEM_kyber_512_length_secret_key,
+		              shared_secret_e, shared_secret_d,
+		              OQS_KEM_kyber_512_length_shared_secret);
+
+		return OQS_ERROR;
+	}
+	rc = OQS_KEM_kyber_512_encaps(ciphertext, shared_secret_e, public_key);
+	if (rc != OQS_SUCCESS) {
+		fprintf(stderr, "ERROR: OQS_KEM_kyber_512_encaps failed!\n");
+		cleanup_stack(secret_key, OQS_KEM_kyber_512_length_secret_key,
+		              shared_secret_e, shared_secret_d,
+		              OQS_KEM_kyber_512_length_shared_secret);
+
+		return OQS_ERROR;
+	}
+	rc = OQS_KEM_kyber_512_decaps(shared_secret_d, ciphertext, secret_key);
+	if (rc != OQS_SUCCESS) {
+		fprintf(stderr, "ERROR: OQS_KEM_kyber_512_decaps failed!\n");
+		cleanup_stack(secret_key, OQS_KEM_kyber_512_length_secret_key,
+		              shared_secret_e, shared_secret_d,
+		              OQS_KEM_kyber_512_length_shared_secret);
+
+		return OQS_ERROR;
+	}
+        secret_key_hex = bytearray2hexstring(shared_secret_e, OQS_KEM_kyber_512_length_shared_secret);
+	printf("Shared secret:%s\n", secret_key_hex);
+        secret_key_hex = bytearray2hexstring(shared_secret_d, OQS_KEM_kyber_512_length_shared_secret);
+	printf("Shared secret:%s\n", secret_key_hex);
+	printf("[example_stack] OQS_KEM_kyber_512 operations completed.\n");
+
+	return OQS_SUCCESS; // success!
+#endif
 }
