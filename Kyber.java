@@ -49,8 +49,8 @@ public class Kyber
     public static void main(String[] args)
         throws GeneralSecurityException
     {
-	    test();
-        //testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_kyber_public_key.txt");
+	    //test();
+        testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_kyber_public_key.txt");
         //testLiboqs2();
     }
 
@@ -119,7 +119,7 @@ public class Kyber
         if (key == null) {
             return null;
         }
-        KyberPublicKeyParameters fpkp = new KyberPublicKeyParameters(KyberParameters.kyber512_aes, key);
+        KyberPublicKeyParameters fpkp = new KyberPublicKeyParameters(KyberParameters.kyber512, key);
         return new BCKyberPublicKey(fpkp);
     }
     
@@ -130,7 +130,7 @@ public class Kyber
             return null;
         }
         byte[] empty = new byte[0];
-        KyberPrivateKeyParameters fpkp = new KyberPrivateKeyParameters(KyberParameters.kyber512_aes, key, empty, empty, empty, empty);
+        KyberPrivateKeyParameters fpkp = new KyberPrivateKeyParameters(KyberParameters.kyber512, key, empty, empty, empty, empty);
         return new BCKyberPrivateKey(fpkp);
     }
 
@@ -157,7 +157,7 @@ public class Kyber
     public static void test() {
         try {
             // https://openquantumsafe.org/liboqs/algorithms/kem/kyber.html
-            KeyPair kp = kyberGenerateKeyPair(KyberParameterSpec.kyber512_aes); // Kyber512_aes
+            KeyPair kp = kyberGenerateKeyPair(KyberParameterSpec.kyber512); // Kyber512
             System.out.println("Kyber public key length: " + kp.getPublic().getEncoded().length + ", format: " + kp.getPublic().getFormat() + ", algorithm: " + kp.getPublic().getAlgorithm());
             //System.out.println("Kyber public key: " + Hex.toHexString(kp.getPublic().getEncoded()));
             System.out.println("Kyber private key length: " + kp.getPrivate().getEncoded().length + ", format: " + kp.getPrivate().getFormat() + ", algorithm: " + kp.getPrivate().getAlgorithm());
@@ -178,7 +178,7 @@ public class Kyber
 
             // generate PublicKey from rawKey
             System.out.println("raw public key size: " + rawKey.length);
-            KyberPublicKeyParameters fpukp = new KyberPublicKeyParameters(KyberParameters.kyber512_aes, rawKey);
+            KyberPublicKeyParameters fpukp = new KyberPublicKeyParameters(KyberParameters.kyber512, rawKey);
             PublicKey puk2 = new BCKyberPublicKey(fpukp);
             System.out.println("public key match:"  + Arrays.equals(kp.getPublic().getEncoded(), puk2.getEncoded()));
 
