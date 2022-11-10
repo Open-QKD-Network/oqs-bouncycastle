@@ -262,7 +262,7 @@ int main(void) {
 	}
 	}
 	else {
-		if (test_bouncycastle_kyber2() == OQS_SUCCESS) {
+		if (test_bouncycastle_kyber() == OQS_SUCCESS) {
 			return EXIT_SUCCESS;
 		} else {
 			return EXIT_FAILURE;
@@ -499,7 +499,7 @@ OQS_STATUS test_bouncycastle_kyber(void) {
 	int cipher_text_size = 0;
 	char* secret_key_hex = NULL;
 
-	kem = OQS_KEM_new(OQS_KEM_alg_kyber_512);
+	kem = OQS_KEM_new(OQS_KEM_alg_kyber_1024);
 	if (kem == NULL) {
 		printf("[test_bouncycastle]  OQS_KEM_frodokem_640_aes was not enabled at "
 		       "compile-time.\n");
@@ -558,9 +558,9 @@ OQS_STATUS test_bouncycastle_kyber(void) {
     secret_key_hex = bytearray2hexstring(shared_secret_d, kem->length_shared_secret);
 	printf("Shared secret:%s\n", secret_key_hex);
 
-	printf("[example_heap]  OQS_KEM_kyber_512 public key size:%lu, secret key size:%lu, ciphertest size:%lu,shared_secrete size:%lu\n",
+	printf("[example_heap]  OQS_KEM_kyber_1024 public key size:%lu, secret key size:%lu, ciphertest size:%lu,shared_secrete size:%lu\n",
 		kem->length_public_key, kem->length_secret_key, kem->length_ciphertext, kem->length_shared_secret);
-	printf("[example_heap]  OQS_KEM_kyber_512 operations completed.\n");
+	printf("[example_heap]  OQS_KEM_kyber_1024 operations completed.\n");
 	cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
 	             ciphertext, kem);
 
@@ -578,9 +578,9 @@ OQS_STATUS test_bouncycastle_kyber2(void) {
 	int public_key_size = 0;
 	char* secret_key_hex = NULL;
 
-	kem = OQS_KEM_new(OQS_KEM_alg_kyber_512);
+	kem = OQS_KEM_new(OQS_KEM_alg_kyber_1024);
 	if (kem == NULL) {
-		printf("[test_bouncycastle]  OQS_KEM_alg_kyber_512 was not enabled at "
+		printf("[test_bouncycastle]  OQS_KEM_alg_kyber_1024 was not enabled at "
 		       "compile-time.\n");
 		return OQS_ERROR;
 	}
@@ -627,9 +627,9 @@ OQS_STATUS test_bouncycastle_kyber2(void) {
     secret_key_hex = bytearray2hexstring(shared_secret_e, kem->length_shared_secret);
 	printf("Shared secret:%s\n", secret_key_hex);
 
-	printf("[example_heap]  OQS_KEM_kyber_512 public key size:%lu, secret key size:%lu, ciphertest size:%lu,shared_secrete size:%lu\n",
+	printf("[example_heap]  OQS_KEM_kyber_1024 public key size:%lu, secret key size:%lu, ciphertest size:%lu,shared_secrete size:%lu\n",
 		kem->length_public_key, kem->length_secret_key, kem->length_ciphertext, kem->length_shared_secret);
-	printf("[example_heap]  OQS_KEM_kyber_512 operations completed.\n");
+	printf("[example_heap]  OQS_KEM_kyber_1024 operations completed.\n");
 	cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
 	             ciphertext, kem);
 	return OQS_SUCCESS;

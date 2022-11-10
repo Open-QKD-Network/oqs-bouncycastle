@@ -50,8 +50,8 @@ public class Kyber
         throws GeneralSecurityException
     {
 	    //test();
-        //testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_kyber_public_key.txt");
-        testLiboqs2();
+        testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_kyber_public_key.txt");
+        //testLiboqs2();
     }
 
     public static KeyPair kyberGenerateKeyPair(KyberParameterSpec kyberParameters) throws GeneralSecurityException
@@ -119,7 +119,7 @@ public class Kyber
         if (key == null) {
             return null;
         }
-        KyberPublicKeyParameters fpkp = new KyberPublicKeyParameters(KyberParameters.kyber512, key);
+        KyberPublicKeyParameters fpkp = new KyberPublicKeyParameters(KyberParameters.kyber1024, key);
         return new BCKyberPublicKey(fpkp);
     }
     
@@ -220,7 +220,7 @@ public class Kyber
     public static boolean testLiboqs2()
     {
         try {
-            KeyPair kp = kyberGenerateKeyPair(KyberParameterSpec.kyber512);
+            KeyPair kp = kyberGenerateKeyPair(KyberParameterSpec.kyber1024);
             byte[] rawKey = ((KyberPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getPublicKey();
             writeByteArrayToFile(rawKey, "/home/kxie/Desktop/oqs-bc/bc_kyber_public_key.txt");
             File file = new File("/home/kxie/Desktop/oqs-bc/oqs_kyber_cipher_text.txt");
