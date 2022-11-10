@@ -50,8 +50,8 @@ public class Kyber
         throws GeneralSecurityException
     {
 	    //test();
-        testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_kyber_public_key.txt");
-        //testLiboqs2();
+        //testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_kyber_public_key.txt");
+        testLiboqs2();
     }
 
     public static KeyPair kyberGenerateKeyPair(KyberParameterSpec kyberParameters) throws GeneralSecurityException

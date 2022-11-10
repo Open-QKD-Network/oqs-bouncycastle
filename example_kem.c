@@ -33,6 +33,7 @@ OQS_STATUS test_bouncycastle(void);
 OQS_STATUS test_bouncycastle2(void);
 OQS_STATUS test_kyber(void);
 OQS_STATUS test_bouncycastle_kyber(void);
+OQS_STATUS test_bouncycastle_kyber2(void);
 
 //0123456789abcdef
 uint8_t char2int(char c) {
@@ -261,7 +262,7 @@ int main(void) {
 	}
 	}
 	else {
-		if (test_bouncycastle_kyber() == OQS_SUCCESS) {
+		if (test_bouncycastle_kyber2() == OQS_SUCCESS) {
 			return EXIT_SUCCESS;
 		} else {
 			return EXIT_FAILURE;
@@ -564,4 +565,72 @@ OQS_STATUS test_bouncycastle_kyber(void) {
 	             ciphertext, kem);
 
 	return OQS_SUCCESS; // success
+}
+
+OQS_STATUS test_bouncycastle_kyber2(void) {
+	OQS_KEM *kem = NULL;
+	uint8_t *public_key = NULL;
+	uint8_t *secret_key = NULL;
+	uint8_t *ciphertext = NULL;
+	uint8_t *shared_secret_e = NULL;
+	uint8_t *shared_secret_d = NULL;
+	FILE* fp = NULL;
+	int public_key_size = 0;
+	char* secret_key_hex = NULL;
+
+	kem = OQS_KEM_new(OQS_KEM_alg_kyber_512);
+	if (kem == NULL) {
+		printf("[test_bouncycastle]  OQS_KEM_alg_kyber_512 was not enabled at "
+		       "compile-time.\n");
+		return OQS_ERROR;
+	}
+
+	public_key = malloc(kem->length_public_key);
+	secret_key = malloc(kem->length_secret_key);
+	ciphertext = malloc(kem->length_ciphertext);
+	shared_secret_e = malloc(kem->length_shared_secret);
+	shared_secret_d = malloc(kem->length_shared_secret);
+	if ((public_key == NULL) || (secret_key == NULL) || (ciphertext == NULL) ||
+	        (shared_secret_e == NULL) || (shared_secret_d == NULL)) {
+		fprintf(stderr, "ERROR: malloc failed!\n");
+		cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
+		             ciphertext, kem);
+
+		return OQS_ERROR;
+	}
+
+	fp = fopen("/home/kxie/Desktop/oqs-bc/bc_kyber_public_key.txt", "r");
+	while (!fp) {
+	    fprintf(stderr, "/home/kxie/Desktop/oqs-bc/bc_kyber_public_key.txt does not exist, wait...\n");
+            usleep(1000 * 1000 * 60);
+	    fp = fopen("/home/kxie/Desktop/oqs-bc/bc_kyber_public_key.txt", "r");
+	}
+	fclose(fp);
+	fprintf(stderr, "Reading public key from bouncycastle\n");
+	public_key = readbytearrayfromfile("/home/kxie/Desktop/oqs-bc/bc_kyber_public_key.txt", &public_key_size);
+	fprintf(stderr, "Public key size:%d\n", public_key_size);
+
+	if (public_key == NULL || (size_t) public_key_size != kem->length_public_key) {
+		fprintf(stderr, "ERROR: can not read public key or public_key_size:%d\n", public_key_size);
+		cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
+		             ciphertext, kem);
+		return OQS_ERROR;
+	}
+	OQS_STATUS rc = OQS_KEM_encaps(kem, ciphertext, shared_secret_e, public_key);
+	if (rc != OQS_SUCCESS) {
+		fprintf(stderr, "ERROR: OQS_KEM_encaps failed!\n");
+		cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
+		             ciphertext, kem);
+		return OQS_ERROR;
+	}
+	writebytearraytofile(ciphertext, kem->length_ciphertext, "/home/kxie/Desktop/oqs-bc/oqs_kyber_cipher_text.txt");
+    secret_key_hex = bytearray2hexstring(shared_secret_e, kem->length_shared_secret);
+	printf("Shared secret:%s\n", secret_key_hex);
+
+	printf("[example_heap]  OQS_KEM_kyber_512 public key size:%lu, secret key size:%lu, ciphertest size:%lu,shared_secrete size:%lu\n",
+		kem->length_public_key, kem->length_secret_key, kem->length_ciphertext, kem->length_shared_secret);
+	printf("[example_heap]  OQS_KEM_kyber_512 operations completed.\n");
+	cleanup_heap(secret_key, shared_secret_e, shared_secret_d, public_key,
+	             ciphertext, kem);
+	return OQS_SUCCESS;
 }
