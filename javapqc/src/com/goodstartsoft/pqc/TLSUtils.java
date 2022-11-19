@@ -16,10 +16,10 @@ public class TLSUtils
      *
      * @return a KeyStore containing a single key with a self-signed certificate.
      */
-    public static KeyStore createIdentityKeyStore()
+    public static KeyStore createIdentityKeyStore(int keylength)
         throws Exception
     {
-        PrivateCredential cred = KeyStoreUtils.createSelfSignedCredentials();
+        PrivateCredential cred = KeyStoreUtils.createSelfSignedCredentials(keylength);
 
         KeyStore store = KeyStore.getInstance("PKCS12", "BC");
 

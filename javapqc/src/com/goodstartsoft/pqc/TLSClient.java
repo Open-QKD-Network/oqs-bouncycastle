@@ -34,7 +34,7 @@ public class TLSClient
         Security.addProvider(new BouncyCastleJsseProvider());
         KeyStore trustStore = null;
         try {
-            trustStore = TLSUtils.createTrustStoreFromFile("/home/kxie/Desktop/trust.p12");
+            trustStore = TLSUtils.createTrustStoreFromFile("/home/kxie/Desktop/trust512.p12");
         } catch (Exception e) {
             System.out.println("Fails to read trust store");
             e.printStackTrace();

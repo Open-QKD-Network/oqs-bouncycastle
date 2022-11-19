@@ -19,16 +19,25 @@ public class KeyStoreUtils
      *
      * @return an X500PrivateCredential containing the key and its certificate.
      */
-    public static PrivateCredential createSelfSignedCredentials()
+    public static PrivateCredential createSelfSignedCredentials(int keylength)
         throws GeneralSecurityException, OperatorCreationException
     {
         JcaX509CertificateConverter certConverter =
                            new JcaX509CertificateConverter().setProvider("BC");
 
-        KeyPair selfSignedKp = EcDsaUtils.generateECKeyPair();
+        KeyPair selfSignedKp = null;
+        if (keylength == 256)
+            selfSignedKp = EcDsaUtils.generateECKeyPair("P-256");
+        if (keylength == 512)
+            selfSignedKp = EcDsaUtils.generateECKeyPair("P-521");
 
-        X509CertificateHolder selfSignedHldr =
-                           JcaX509Certificate.createTrustAnchor(selfSignedKp, "SHA256withECDSA");
+        X509CertificateHolder selfSignedHldr = null;
+        if (keylength == 256)
+            selfSignedHldr =
+                        JcaX509Certificate.createTrustAnchor(selfSignedKp, "SHA256withECDSA");
+        if (keylength == 512)
+            selfSignedHldr =
+                       JcaX509Certificate.createTrustAnchor(selfSignedKp, "SHA512withECDSA");
 
         X509Certificate selfSignedCert = certConverter.getCertificate(selfSignedHldr);
 

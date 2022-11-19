@@ -29,26 +29,26 @@ public class TLSServer {
             "TLS_AES_256_GCM_SHA384"};
      
     public static void main(String[] args) {
-        /*try {
-            KeyStore identityStore = TLSUtils.createIdentityKeyStore();
+        try {
+            KeyStore identityStore = TLSUtils.createIdentityKeyStore(512);
             KeyStore trustStore = TLSUtils.createTrustStore(identityStore);
-            TLSUtils.saveIdentityStoreToFile(identityStore, "/home/kxie/Desktop/identity.p12");
-            TLSUtils.saveTrustStoreToFile(trustStore, "/home/kxie/Desktop/trust.p12");
-            KeyStore identityStore2 = TLSUtils.createIdentityStoreFromFile("/home/kxie/Desktop/identity.p12");
-            KeyStore trustStore2 = TLSUtils.createTrustStoreFromFile("/home/kxie/Desktop/trust.p12");
+            TLSUtils.saveIdentityStoreToFile(identityStore, "/home/kxie/Desktop/identity512.p12");
+            TLSUtils.saveTrustStoreToFile(trustStore, "/home/kxie/Desktop/trust512.p12");
+            KeyStore identityStore2 = TLSUtils.createIdentityStoreFromFile("/home/kxie/Desktop/identity512.p12");
+            KeyStore trustStore2 = TLSUtils.createTrustStoreFromFile("/home/kxie/Desktop/trust512.p12");
             System.out.println(identityStore2.equals(identityStore));
             System.out.println(trustStore2.equals(trustStore));
-            TLSUtils.saveIdentityStoreToFile(identityStore2, "/home/kxie/Desktop/identity2.p12");
-            TLSUtils.saveTrustStoreToFile(trustStore2, "/home/kxie/Desktop/trust2.p12");
+            TLSUtils.saveIdentityStoreToFile(identityStore2, "/home/kxie/Desktop/identity5122.p12");
+            TLSUtils.saveTrustStoreToFile(trustStore2, "/home/kxie/Desktop/trust5122.p12");
             System.out.println("Good!");
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
         Security.addProvider(new BouncyCastleProvider());
         Security.addProvider(new BouncyCastleJsseProvider());
         KeyStore serverStore = null;
         try {
-            serverStore = TLSUtils.createIdentityStoreFromFile("/home/kxie/Desktop/identity.p12");
+            serverStore = TLSUtils.createIdentityStoreFromFile("/home/kxie/Desktop/identity512.p12");
         } catch (Exception e) {
             System.out.println("Fails to read identity");
             e.printStackTrace();
