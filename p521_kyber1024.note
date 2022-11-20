@@ -64,3 +64,14 @@ Enter Import Password:
 5.4 run openssl/liboqs client
 
 kxie@kxie-ubuntu-20:~/open-quantum-safe$ openssl-install/openssl/bin/openssl s_client -groups p521_kyber1024 -CAfile ~/Desktop/cert512.pem -connect 127.0.0.1:8080
+
+6. Run spring boot with p521_kyber1024
+
+*** Springboot can only use RSA certificate ***
+
+6.1 git clone https://github.com/kaiduanx/springboot-tls.git
+6.2 cd example1, mvn clean package
+6.3 run.sh
+6.4 cd openquantum-safe
+
+openssl-install/openssl/bin/openssl s_client -groups p521_kyber1024 -CAfile ./springboot-demo-cert.pem -connect 127.0.0.1:8080
