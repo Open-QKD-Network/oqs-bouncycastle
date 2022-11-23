@@ -31,7 +31,7 @@ mvn clean package
 
 ### Run httpcurl client
 ```sh
-export /home/kxie/open-quantum-safe/openssl-install/openssl/lib/:/home/kxie/qs-bouncycastle/httpcurl/curl-install/lib
+export LD_LIBRARY_PATH=/home/kxie/open-quantum-safe/openssl-install/openssl/lib/:/home/kxie/qs-bouncycastle/httpcurl/curl-install/lib
 kxie@kxie-ubuntu-20:~/open-quantum-safe/httpcurl$./httpcurl.exe 
 JSON:{"name": "Erlang","job": "Programmer"}
 HTTP RESPONSE CODE:200
