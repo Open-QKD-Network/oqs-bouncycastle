@@ -25,6 +25,7 @@ make
 ### Run spring-boot http server
 ```sh
 git clone https://github.com/kaiduanx/springboot-tls.git
+git checkout bc-source
 mvn clean package 
 ./run.sh
 ```
