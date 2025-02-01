@@ -28,58 +28,58 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcprov-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcprov-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcprov-ext-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcprov-ext-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcutil-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcutil-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcutil-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcpkix-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcpkix-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcmail-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcmail-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcmail-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcjmail-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcjmail-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcjmail-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpg-jdk18on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bcpg-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bcpg-jdk18on-1.79.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bctls-jdk15on</artifactId>
-      <version>1.7.1</version>
+      <version>1.79</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/bctls-jdk18on-171.jar</systemPath>
+      <systemPath>${basedir}/lib/bctls-jdk18on-1.79.jar</systemPath>
     </dependency>
   </dependencies>
 </project>
