@@ -45,11 +45,19 @@ public class Frodo
     static {
         java.security.Security.addProvider(new org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider());
     }
+
+    static public String BC_PUBLIC_KEY   = "/home/dell2/Desktop/bc-frodom-publickey.txt";
+    static public String BC_PRIVATE_KEY  = "/home/dell2/Desktop/bc-frodom-privkey.txt";
+    static public String BC_CIPHER_TEXT  = "/home/dell2/Desktop/bc-frodom-ciphertext.txt";
+    static public String OQS_PUBLIC_KEY  = "/home/dell2/Desktop/oqs-frodom-publickey.txt";
+    static public String OQS_PRIVATE_KEY = "/home/dell2/Desktop/oqs-frodom-privkey.txt";
+    static public String OQS_CIPHER_TEXT = "/home/dell2/Desktop/oqs-frodom-ciphertext.txt";
+
     public static void main(String[] args)
         throws GeneralSecurityException
     {
-	//test();
-        testLiboqs("/home/kxie/Desktop/oqs-bc/oqs_public_key.txt");
+	    test();
+        //testLiboqs(OQS_PUBLIC_KEY);
         //testLiboqs2();
     }
 
@@ -93,10 +101,10 @@ public class Frodo
             String hexString = Hex.toHexString(bytes);
             Files.write(Paths.get(fileName), hexString.getBytes());
             return true;
-	} catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
 	    return false;
-	}
+	    }
     }
     
     public static byte[] readByteArrayFromFile(String fileName) {
@@ -131,17 +139,17 @@ public class Frodo
     public static boolean testFrodoKEM(String publicKeyFileName, String privateKeyFileName) {
         PublicKey publicKey = readFrodoPublicKeyFromFile(publicKeyFileName);
         PrivateKey privateKey = readFrodoPrivateKeyFromFile(privateKeyFileName);
-	if (publicKey == null || privateKey == null) {
+	    if (publicKey == null || privateKey == null) {
             System.out.println("testForodKEMEncap fails, check publicKey/privateKey!");
-	    return false;
+	        return false;
         }
         try {
             SecretKeyWithEncapsulation secEnc1 = frodoGeneratePartyU(publicKey);
-	    writeByteArrayToFile(secEnc1.getEncapsulation(), "/home/kxie/Desktop/bc-frodo-ciphertext.txt");
+	        writeByteArrayToFile(secEnc1.getEncapsulation(), BC_CIPHER_TEXT);
             SecretKeyWithEncapsulation secEnc2 = frodoGeneratePartyV(privateKey, secEnc1.getEncapsulation());
             System.out.println("secrets match: " + Arrays.equals(secEnc1.getEncoded(), secEnc2.getEncoded()));
-	    return Arrays.equals(secEnc1.getEncoded(), secEnc2.getEncoded());
-	} catch (Exception e) {
+	        return Arrays.equals(secEnc1.getEncoded(), secEnc2.getEncoded());
+	    } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -163,7 +171,7 @@ public class Frodo
             byte[] kppb = Hex.decode(Hex.toHexString(kp.getPublic().getEncoded()));
             System.out.println("Hex decode/encode mathc: " + Arrays.equals(kppb, kp.getPublic().getEncoded()));
             System.out.println("secrets match: " + Arrays.equals(secEnc1.getEncoded(), secEnc2.getEncoded()));
-	    //write(kp.getPrivate(), "frodo-private.pem");
+	        //write(kp.getPrivate(), "frodo-private.pem");
             //write(kp.getPublic(),  "frodo-public.pem");
 
             // get the rawkey from PublicKey
@@ -176,41 +184,41 @@ public class Frodo
             System.out.println("public key match:"  + Arrays.equals(kp.getPublic().getEncoded(), puk2.getEncoded()));
 
             //write(pk2, "frodo-public2.pem");
-	    writeByteArrayToFile(rawKey, "/home/kxie/Desktop/bc-frodom-publickey.txt");
-	    byte[] rkey = readByteArrayFromFile("/home/kxie/Desktop/bc-frodom-publickey.txt");
+	        writeByteArrayToFile(rawKey, BC_PUBLIC_KEY);
+	        byte[] rkey = readByteArrayFromFile(BC_PUBLIC_KEY);
             System.out.println("write/read public key match:"  + Arrays.equals(rawKey, rkey));
 
             rawKey = ((FrodoPrivateKeyParameters) PrivateKeyFactory.createKey(kp.getPrivate().getEncoded())).getPrivateKey();
-	    // generate PrivateKey from rawKey
+	        // generate PrivateKey from rawKey
             System.out.println("raw private key size: " + rawKey.length);
             FrodoPrivateKeyParameters fprkp = new FrodoPrivateKeyParameters(FrodoParameters.frodokem19888r3, rawKey);
             PrivateKey prk2 = new BCFrodoPrivateKey(fprkp);
             System.out.println("private key match:"  + Arrays.equals(kp.getPrivate().getEncoded(), prk2.getEncoded()));
 
-	    writeByteArrayToFile(rawKey, "/home/kxie/Desktop/bc-frodom-privatekey.txt");
-	    rkey = readByteArrayFromFile("/home/kxie/Desktop/bc-frodom-privatekey.txt");
+	        writeByteArrayToFile(rawKey, BC_PRIVATE_KEY);
+	        rkey = readByteArrayFromFile(BC_PRIVATE_KEY);
             System.out.println("write/read private key match:"  + Arrays.equals(rawKey, rkey));
 
-            testFrodoKEM("/home/kxie/Desktop/bc-frodom-publickey.txt", "/home/kxie/Desktop/bc-frodom-privatekey.txt");
+            testFrodoKEM(BC_PUBLIC_KEY, BC_PRIVATE_KEY);
         } catch (Exception e) {
             e.printStackTrace();
-	}
+	    }
     }
 
     // liboqs writes public key to file, bouncycastle reads public key,
     // encaps with the public key, writes the cipher text to file for liboqs to decap.
     public static boolean testLiboqs(String publicKeyFileName) {
         PublicKey publicKey = readFrodoPublicKeyFromFile(publicKeyFileName);
-	if (publicKey == null) {
+        if (publicKey == null) {
             System.out.println("testLiboqs fails, check publicKey!");
 	    return false;
         }
         try {
             SecretKeyWithEncapsulation secEnc1 = frodoGeneratePartyU(publicKey);
-	    writeByteArrayToFile(secEnc1.getEncapsulation(), "/home/kxie/Desktop/oqs-bc/bc_cipher_text.txt");
-	    System.out.println("Shared secret:" + Hex.toHexString(secEnc1.getEncoded()));
-	    return true;
-	} catch (Exception e) {
+            writeByteArrayToFile(secEnc1.getEncapsulation(), BC_CIPHER_TEXT);
+            System.out.println("Shared secret:" + Hex.toHexString(secEnc1.getEncoded()));
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -222,17 +230,17 @@ public class Frodo
         try {
             KeyPair kp = frodoGenerateKeyPair(FrodoParameterSpec.frodokem19888r3); // FrodoKEM-640-AEM, cipher text size: 9720, AES keysize: 16, public key length: 9644, private key length: 19918
             byte[] rawKey = ((FrodoPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getPublicKey();
-            writeByteArrayToFile(rawKey, "/home/kxie/Desktop/oqs-bc/bc_public_key.txt");
-            File file = new File("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
+            writeByteArrayToFile(rawKey, BC_PUBLIC_KEY);
+            File file = new File(OQS_CIPHER_TEXT);
             while (!file.exists()) {
-                System.out.println("File /home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt is not ready, wait 1 minute");
+                System.out.println("File " + OQS_CIPHER_TEXT + " is not ready, wait 1 minute");
                 Thread.sleep(1000 * 60); // sleep 1 minute
-                file = new File("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
+                file = new File(OQS_CIPHER_TEXT);
             }
-            byte[] cipher = readByteArrayFromFile("/home/kxie/Desktop/oqs-bc/oqs_cipher_text.txt");
-	    System.out.println("cipher text size:" + cipher.length);
+            byte[] cipher = readByteArrayFromFile(OQS_CIPHER_TEXT);
+            System.out.println("cipher text size:" + cipher.length);
             SecretKeyWithEncapsulation decap = frodoGeneratePartyV(kp.getPrivate(), cipher);
-	    System.out.println("Shared secret:" + Hex.toHexString(decap.getEncoded()));
+            System.out.println("Shared secret:" + Hex.toHexString(decap.getEncoded()));
             return true;
         } catch (Exception e) {
             System.out.println("Exception in testLiboqs2)");
