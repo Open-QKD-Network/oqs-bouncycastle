@@ -46,12 +46,12 @@ public class Frodo
         java.security.Security.addProvider(new org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider());
     }
 
-    static public String BC_PUBLIC_KEY   = "/home/dell2/Desktop/bc-frodom-publickey.txt";
-    static public String BC_PRIVATE_KEY  = "/home/dell2/Desktop/bc-frodom-privkey.txt";
-    static public String BC_CIPHER_TEXT  = "/home/dell2/Desktop/bc-frodom-ciphertext.txt";
-    static public String OQS_PUBLIC_KEY  = "/home/dell2/Desktop/oqs-frodom-publickey.txt";
-    static public String OQS_PRIVATE_KEY = "/home/dell2/Desktop/oqs-frodom-privkey.txt";
-    static public String OQS_CIPHER_TEXT = "/home/dell2/Desktop/oqs-frodom-ciphertext.txt";
+    static public String BC_PUBLIC_KEY   = System.getProperty("user.home") + File.separator + "Desktop/bc-frodom-publickey.txt";
+    static public String BC_PRIVATE_KEY  = System.getProperty("user.home") + File.separator + "Desktop/bc-frodom-privkey.txt";
+    static public String BC_CIPHER_TEXT  = System.getProperty("user.home") + File.separator + "Desktop/bc-frodom-ciphertext.txt";
+    static public String OQS_PUBLIC_KEY  = System.getProperty("user.home") + File.separator + "Desktop/oqs-frodom-publickey.txt";
+    static public String OQS_PRIVATE_KEY = System.getProperty("user.home") + File.separator + "Desktop/oqs-frodom-privkey.txt";
+    static public String OQS_CIPHER_TEXT = System.getProperty("user.home") + File.separator + "Desktop/oqs-frodom-ciphertext.txt";
 
     public static void main(String[] args)
         throws GeneralSecurityException
