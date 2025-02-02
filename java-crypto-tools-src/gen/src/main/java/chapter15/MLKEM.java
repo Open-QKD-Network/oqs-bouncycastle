@@ -4,6 +4,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -33,6 +34,7 @@ import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters;
 import org.bouncycastle.pqc.crypto.mlkem.MLKEMPrivateKeyParameters;
 import org.bouncycastle.pqc.crypto.mlkem.MLKEMParameters;
 import org.bouncycastle.pqc.jcajce.provider.kyber.BCKyberPublicKey;
+import org.bouncycastle.pqc.jcajce.spec.KyberParameterSpec;
 import org.bouncycastle.pqc.jcajce.provider.kyber.BCKyberPrivateKey;
 import org.bouncycastle.pqc.crypto.util.PublicKeyFactory;
 import org.bouncycastle.pqc.crypto.util.PrivateKeyFactory;
@@ -54,10 +56,35 @@ public class MLKEM
 
     public static void main(String[] args) {
         try {
-	        test();
+	        //test(MLKEMParameterSpec.ml_kem_512, MLKEMParameters.ml_kem_512, 128);
+            test(MLKEMParameterSpec.ml_kem_1024, MLKEMParameters.ml_kem_1024, 384);
+            //testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_1024, 128);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static KeyPair MLKEMGenerateKeyPair(MLKEMParameterSpec param) throws GeneralSecurityException
+    {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("ML-KEM", "BC");
+        kpg.initialize(param, new SecureRandom());
+        return kpg.generateKeyPair();
+    }
+
+    public static SecretKeyWithEncapsulation MLKEMGeneratePartyU(PublicKey vPubKey, int bits) throws GeneralSecurityException
+    {
+        KeyGenerator keygen = KeyGenerator.getInstance("ML-KEM", "BC");
+        keygen.init(new KEMGenerateSpec(vPubKey, "AES", bits), new SecureRandom());
+
+        return (SecretKeyWithEncapsulation)keygen.generateKey();
+    }
+
+    public static SecretKeyWithEncapsulation MLKEMGeneratePartyV(PrivateKey vPriv, byte[] ciphertext, int bits) throws GeneralSecurityException
+    {
+        KeyGenerator keygen = KeyGenerator.getInstance("ML-KEM", "BC");
+        keygen.init(new KEMExtractSpec(vPriv, ciphertext, "AES", bits));
+
+        return (SecretKeyWithEncapsulation)keygen.generateKey();
     }
 
     public static boolean writeByteArrayToFile(byte[] bytes, String fileName) {
@@ -100,9 +127,9 @@ public class MLKEM
         return new BCKyberPrivateKey(fpkp);
     }
 
-    public static void test() throws Exception {
+    public static void test(MLKEMParameterSpec spec, MLKEMParameters parameters, int bits) throws Exception {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("ML-KEM", "BC");
-        kpg.initialize(MLKEMParameterSpec.ml_kem_512, new SecureRandom());
+        kpg.initialize(spec, new SecureRandom());
         KeyPair kp = kpg.generateKeyPair();
 
         // https://openquantumsafe.org/liboqs/algorithms/kem/kyber
@@ -111,7 +138,7 @@ public class MLKEM
         byte[] rawKey = ((MLKEMPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getEncoded();
         System.out.println("raw public key encoded size : " + kp.getPublic().getEncoded().length); // 822
         System.out.println("raw public key size         : " + rawKey.length); // 800
-        MLKEMPublicKeyParameters fpukp = new MLKEMPublicKeyParameters(MLKEMParameters.ml_kem_512, rawKey);
+        MLKEMPublicKeyParameters fpukp = new MLKEMPublicKeyParameters(parameters, rawKey);
         PublicKey puk2 = new BCKyberPublicKey(fpukp);
         System.out.println("puk2 keysize: " + puk2.getEncoded().length);
         System.out.println("public key match:"  + Arrays.areEqual(kp.getPublic().getEncoded(), puk2.getEncoded()));
@@ -133,7 +160,7 @@ public class MLKEM
         System.out.println("write/read private key match:"  + Arrays.areEqual(rawKey, rkey));
 
         KeyGenerator keygen = KeyGenerator.getInstance("ML-KEM", "BC");
-        keygen.init(new KEMGenerateSpec(kp.getPublic(), "AES", 128), new SecureRandom());
+        keygen.init(new KEMGenerateSpec(kp.getPublic(), "AES", bits), new SecureRandom());
 
         SecretKeyWithEncapsulation secEnc1 = (SecretKeyWithEncapsulation)keygen.generateKey();
         // secEnc1.getEncoded() // shared secret
@@ -146,8 +173,40 @@ public class MLKEM
         if (Arrays.areEqual(secEnc1.getEncoded(), secEnc2.getEncoded())) {
             System.out.println("AES key generated successfully:" + Hex.toHexString(secEnc1.getEncoded()));
             System.exit(0);
+        } else {
+            System.out.println("AES key generated failed:" + Hex.toHexString(secEnc1.getEncoded()));
+            System.out.println("AES key generated failed:" + Hex.toHexString(secEnc2.getEncoded()));
+
         }
 
         System.exit(1);
+    }
+
+    // BC Decap OQS Encap
+    // bouncy castle writes the public key to file, liboqs encaps with the public key
+    // reads the cipher text from liboqs, and decaps the cipher text.
+    public static boolean testOQSEncapBCDecap(MLKEMParameterSpec spec, int bits)
+    {
+        try {
+            KeyPair kp = MLKEMGenerateKeyPair(MLKEMParameterSpec.ml_kem_512);// MLKEMParameterSpec.ml_kem_512, 128
+            byte[] rawKey = ((MLKEMPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getEncoded();
+            System.out.println("Write public key to " + BC_PUBLIC_KEY);
+            writeByteArrayToFile(rawKey, BC_PUBLIC_KEY);
+            File file = new File(OQS_CIPHER_TEXT);
+            while (!file.exists()) {
+                System.out.println("File " + OQS_CIPHER_TEXT + " is not ready, wait 1 minute");
+                Thread.sleep(1000 * 60); // sleep 1 minute
+                file = new File(OQS_CIPHER_TEXT);
+            }
+            byte[] cipher = readByteArrayFromFile(OQS_CIPHER_TEXT);
+	        System.out.println("cipher text size:" + cipher.length);
+            SecretKeyWithEncapsulation decap = MLKEMGeneratePartyV(kp.getPrivate(), cipher, bits);
+            System.out.println("Shared secret:" + Hex.toHexString(decap.getEncoded()));
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception in testOQSEncapBCDecap");
+            e.printStackTrace();
+            return false;
+        }
     }
 }
