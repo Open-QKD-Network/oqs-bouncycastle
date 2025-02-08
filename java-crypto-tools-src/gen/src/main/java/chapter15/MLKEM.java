@@ -26,6 +26,8 @@ import org.bouncycastle.util.encoders.Hex;
 import javax.crypto.KeyGenerator;
 
 import org.bouncycastle.jcajce.SecretKeyWithEncapsulation;
+import org.bouncycastle.jcajce.provider.asymmetric.mlkem.BCMLKEMPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.mlkem.BCMLKEMPublicKey;
 import org.bouncycastle.jcajce.spec.KEMExtractSpec;
 import org.bouncycastle.jcajce.spec.KEMGenerateSpec;
 import org.bouncycastle.jcajce.spec.MLKEMParameterSpec;
@@ -38,6 +40,7 @@ import org.bouncycastle.pqc.jcajce.spec.KyberParameterSpec;
 import org.bouncycastle.pqc.jcajce.provider.kyber.BCKyberPrivateKey;
 import org.bouncycastle.pqc.crypto.util.PublicKeyFactory;
 import org.bouncycastle.pqc.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.pqc.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.Arrays;
 
 
@@ -58,7 +61,8 @@ public class MLKEM
         try {
             //test(MLKEMParameterSpec.ml_kem_512, MLKEMParameters.ml_kem_512, 256);
             //test(MLKEMParameterSpec.ml_kem_1024, MLKEMParameters.ml_kem_1024, 256);
-            testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_512, 256);
+            //testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_512, 256);
+            testOQSDecapBCEncap(MLKEMParameters.ml_kem_512, 256);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,32 +139,19 @@ public class MLKEM
         // https://openquantumsafe.org/liboqs/algorithms/kem/kyber
         // mlkem-512: public key size/800, private key size/1632, cipher text size/768, shared secret size/32
         // Test public/private key write to file/read from file
-        byte[] rawKey = ((MLKEMPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getEncoded();
-        System.out.println("raw public key encoded size : " + kp.getPublic().getEncoded().length); // 822
+        BCMLKEMPublicKey pubk = (BCMLKEMPublicKey) kp.getPublic();
+        byte[] rawKey = pubk.getPublicData();
         System.out.println("raw public key size         : " + rawKey.length); // 800
         MLKEMPublicKeyParameters fpukp = new MLKEMPublicKeyParameters(parameters, rawKey);
-        PublicKey puk2 = new BCKyberPublicKey(fpukp);
-        System.out.println("puk2 keysize: " + puk2.getEncoded().length);
+        PublicKey puk2 = new BCMLKEMPublicKey(fpukp);
         System.out.println("public key match:"  + Arrays.areEqual(kp.getPublic().getEncoded(), puk2.getEncoded()));
         writeByteArrayToFile(rawKey, BC_PUBLIC_KEY);
         byte[] rkey = readByteArrayFromFile(BC_PUBLIC_KEY);
         System.out.println("write/read public key match:"  + Arrays.areEqual(rawKey, rkey));
 
-        // Test private key
-        /*rawKey = ((MLKEMPrivateKeyParameters) PrivateKeyFactory.createKey(kp.getPrivate().getEncoded())).getEncoded();
-        System.out.println("raw private key encoded size : " + kp.getPrivate().getEncoded().length);
-        System.out.println("raw private key size         : " + rawKey.length);
-        MLKEMPrivateKeyParameters fprkp = new MLKEMPrivateKeyParameters(MLKEMParameters.ml_kem_512, rawKey);
-        PrivateKey prk2 = new BCKyberPrivateKey(fprkp); // this is wrong???
-        System.out.println("original private key encoded length:" + kp.getPrivate().getEncoded().length);
-        System.out.println("recover  private key encoded length:" + prk2.getEncoded().length);        
-        System.out.println("private key match:"  + Arrays.areEqual(kp.getPrivate().getEncoded(), prk2.getEncoded()));
-        writeByteArrayToFile(rawKey, BC_PRIVATE_KEY);
-        rkey = readByteArrayFromFile(BC_PRIVATE_KEY);
-        System.out.println("write/read private key match:"  + Arrays.areEqual(rawKey, rkey));*/
-
         KeyGenerator keygen = KeyGenerator.getInstance("ML-KEM", "BC");
-        keygen.init(new KEMGenerateSpec(kp.getPublic(), "AES", bits), new SecureRandom());
+        keygen.init(new KEMGenerateSpec(puk2, "AES", bits), new SecureRandom());
+        //keygen.init(new KEMGenerateSpec(kp.getPublic(), "AES", bits), new SecureRandom());
 
         SecretKeyWithEncapsulation secEnc1 = (SecretKeyWithEncapsulation)keygen.generateKey();
         // secEnc1.getEncoded() // shared secret
@@ -189,7 +180,8 @@ public class MLKEM
     {
         try {
             KeyPair kp = MLKEMGenerateKeyPair(spec);
-            byte[] rawKey = ((MLKEMPublicKeyParameters) PublicKeyFactory.createKey(kp.getPublic().getEncoded())).getEncoded();
+            BCMLKEMPublicKey pubk = (BCMLKEMPublicKey) kp.getPublic();
+            byte[] rawKey = pubk.getPublicData();
             System.out.println("Write public key to " + BC_PUBLIC_KEY);
             writeByteArrayToFile(rawKey, BC_PUBLIC_KEY);
             File file = new File(OQS_CIPHER_TEXT);
@@ -206,6 +198,34 @@ public class MLKEM
             return true;
         } catch (Exception e) {
             System.out.println("Exception in testOQSEncapBCDecap");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // OQS Decap BC Encap
+    // bouncy castle writes the public key to file, liboqs encaps with the public key
+    // bouncy castle reads the cipher text from liboqs, and decaps the cipher text.
+    public static boolean testOQSDecapBCEncap(MLKEMParameters parameters, int bits)
+    {
+        try {
+            // Read OQS public key
+            File file = new File(OQS_PUBLIC_KEY);
+            while (!file.exists()) {
+                System.out.println("File " + OQS_PUBLIC_KEY + " is not ready, wait 1 minute");
+                Thread.sleep(1000 * 60); // sleep 1 minute
+                file = new File(OQS_PUBLIC_KEY);
+            }
+            byte[] rawKey = readByteArrayFromFile(OQS_PUBLIC_KEY);
+            System.out.println("public key size:" + rawKey.length);
+            MLKEMPublicKeyParameters fpukp = new MLKEMPublicKeyParameters(parameters, rawKey);
+            PublicKey pubKey = new BCMLKEMPublicKey(fpukp);
+            SecretKeyWithEncapsulation secEncap = MLKEMGeneratePartyU(pubKey, 256);
+            writeByteArrayToFile(secEncap.getEncapsulation(), BC_CIPHER_TEXT);
+            byte[] sharedSecret = secEncap.getEncoded();
+            System.out.println("Shared secred length: " + sharedSecret.length + ", secret: " + Hex.toHexString(sharedSecret));
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }

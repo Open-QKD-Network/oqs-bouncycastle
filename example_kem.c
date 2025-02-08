@@ -263,21 +263,25 @@ static OQS_STATUS example_heap(void) {
 int main(void) {
 	//test_kyber();
 	//test_ml_kem_512();
-	test_kem(OQS_KEM_alg_ml_kem_512);
-	/*
-	if (0) {
-		if (example_stack() == OQS_SUCCESS && example_heap() == OQS_SUCCESS) {
-			return EXIT_SUCCESS;
-		} else {
-			return EXIT_FAILURE;
-		}
+	//test_kem(OQS_KEM_alg_ml_kem_512);
+	if (1) {
+		//if (example_stack() == OQS_SUCCESS && example_heap() == OQS_SUCCESS) {
+		//	return EXIT_SUCCESS;
+		//} else {
+		//	return EXIT_FAILURE;
+		//}
+            if (test_bouncycastle_encap_oqs_decap(OQS_KEM_alg_ml_kem_512) == OQS_SUCCESS) {
+                return EXIT_SUCCESS;
+            } else {
+                return EXIT_FAILURE;
+            }
 	} else {
 		if (test_oqs_encap_bouncycastle_decap(OQS_KEM_alg_ml_kem_512) == OQS_SUCCESS) {
 			return EXIT_SUCCESS;
 		} else {
 			return EXIT_FAILURE;
 		}
-	}*/
+	}
 }
 
 void cleanup_stack(uint8_t *secret_key, size_t secret_key_len,
