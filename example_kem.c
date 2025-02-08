@@ -118,7 +118,7 @@ uint8_t* readbytearrayfromfile(const char* filename, int* size) {
     if (hexstring)
     {
         fsize = fread(hexstring, 1, length, fp);
-	printf("readbytearrayfromfile, fsize=%lu\n", fsize);
+        printf("readbytearrayfromfile, fsize=%lu\n", fsize);
     }
     fclose(fp);
 
@@ -413,7 +413,7 @@ OQS_STATUS test_oqs_encap_bouncycastle_decap(char* alg_name) {
 	    fp = fopen(BC_PUBLIC_KEY, "r");
 	}
 	fclose(fp);
-	fprintf(stderr, "Reading public key from bouncycastle\n");
+	fprintf(stderr, "Reading public key from bouncycastle %s\n", BC_PUBLIC_KEY);
 	public_key = readbytearrayfromfile(BC_PUBLIC_KEY, &public_key_size);
 	fprintf(stderr, "Public key size:%d\n", public_key_size);
 
