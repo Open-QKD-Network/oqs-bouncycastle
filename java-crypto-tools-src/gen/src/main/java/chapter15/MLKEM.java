@@ -57,8 +57,8 @@ public class MLKEM
     public static void main(String[] args) {
         try {
             //test(MLKEMParameterSpec.ml_kem_512, MLKEMParameters.ml_kem_512, 256);
-            test(MLKEMParameterSpec.ml_kem_1024, MLKEMParameters.ml_kem_1024, 256);
-            //testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_512, 256);
+            //test(MLKEMParameterSpec.ml_kem_1024, MLKEMParameters.ml_kem_1024, 256);
+            testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_512, 256);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -200,6 +200,7 @@ public class MLKEM
             }
             byte[] cipher = readByteArrayFromFile(OQS_CIPHER_TEXT);
 	        System.out.println("cipher text size:" + cipher.length);
+            writeByteArrayToFile(cipher, "/home/dell2/Desktop/bc-read-ciphertext");
             SecretKeyWithEncapsulation decap = MLKEMGeneratePartyV(kp.getPrivate(), cipher, bits);
             System.out.println("Shared secret:" + Hex.toHexString(decap.getEncoded()));
             return true;
