@@ -62,7 +62,12 @@ public class MLKEM
             //test(MLKEMParameterSpec.ml_kem_512, MLKEMParameters.ml_kem_512, 256);
             //test(MLKEMParameterSpec.ml_kem_1024, MLKEMParameters.ml_kem_1024, 256);
             //testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_512, 256);
-            testOQSDecapBCEncap(MLKEMParameters.ml_kem_512, 256);
+            //testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_768, 256);
+            testOQSEncapBCDecap(MLKEMParameterSpec.ml_kem_1024, 256);
+
+            //testOQSDecapBCEncap(MLKEMParameters.ml_kem_1024, 256);
+            //testOQSDecapBCEncap(MLKEMParameters.ml_kem_768, 256);
+            //testOQSDecapBCEncap(MLKEMParameters.ml_kem_512, 256);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +83,11 @@ public class MLKEM
     public static SecretKeyWithEncapsulation MLKEMGeneratePartyU(PublicKey vPubKey, int bits) throws GeneralSecurityException
     {
         KeyGenerator keygen = KeyGenerator.getInstance("ML-KEM", "BC");
-        keygen.init(new KEMGenerateSpec(vPubKey, "AES", bits), new SecureRandom());
+        KEMGenerateSpec.Builder builder = new KEMGenerateSpec.Builder(vPubKey, "AES", bits);
+        builder.withNoKdf();
+        KEMGenerateSpec spec = builder.build();
+        keygen.init(spec, new SecureRandom());
+        //keygen.init(new KEMGenerateSpec(vPubKey, "AES", bits), new SecureRandom());
 
         return (SecretKeyWithEncapsulation)keygen.generateKey();
     }
@@ -86,7 +95,11 @@ public class MLKEM
     public static SecretKeyWithEncapsulation MLKEMGeneratePartyV(PrivateKey vPriv, byte[] ciphertext, int bits) throws GeneralSecurityException
     {
         KeyGenerator keygen = KeyGenerator.getInstance("ML-KEM", "BC");
-        keygen.init(new KEMExtractSpec(vPriv, ciphertext, "AES", bits));
+        KEMExtractSpec.Builder builder = new KEMExtractSpec.Builder(vPriv, ciphertext, "AES", bits);
+        builder.withNoKdf();
+        KEMExtractSpec spec = builder.build();
+        keygen.init(spec);
+        //keygen.init(new KEMExtractSpec(vPriv, ciphertext, "AES", bits));
 
         return (SecretKeyWithEncapsulation)keygen.generateKey();
     }
@@ -181,7 +194,9 @@ public class MLKEM
         try {
             KeyPair kp = MLKEMGenerateKeyPair(spec);
             BCMLKEMPublicKey pubk = (BCMLKEMPublicKey) kp.getPublic();
-            byte[] rawKey = pubk.getPublicData();
+            //byte[] rawKey = pubk.getPublicData();
+            MLKEMPublicKeyParameters pkp = (MLKEMPublicKeyParameters) PublicKeyFactory.createKey(pubk.getEncoded());
+            byte[] rawKey = pkp.getEncoded();
             System.out.println("Write public key to " + BC_PUBLIC_KEY);
             writeByteArrayToFile(rawKey, BC_PUBLIC_KEY);
             File file = new File(OQS_CIPHER_TEXT);
