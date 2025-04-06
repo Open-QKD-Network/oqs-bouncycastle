@@ -1,5 +1,6 @@
 package com.goodstartsoft.pqc;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -27,28 +28,32 @@ public class TLSServer {
     private static final String[] protocols = new String[] {"TLSv1.3"};
     private static final String[] cipher_suites = new String[] {
             "TLS_AES_256_GCM_SHA384"};
-     
+
+    static public String DESKTOP_DIR = System.getProperty("user.home") + File.separator + "Desktop/";
+    static public String IDENTITY_STORE = DESKTOP_DIR + "identity512.p12";
+    static public String TRUST_STORE = DESKTOP_DIR + "trust512.p12";
+
     public static void main(String[] args) {
-        try {
+        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleJsseProvider());
+        /*try {
             KeyStore identityStore = TLSUtils.createIdentityKeyStore(512);
             KeyStore trustStore = TLSUtils.createTrustStore(identityStore);
-            TLSUtils.saveIdentityStoreToFile(identityStore, "/home/kxie/Desktop/identity512.p12");
-            TLSUtils.saveTrustStoreToFile(trustStore, "/home/kxie/Desktop/trust512.p12");
-            KeyStore identityStore2 = TLSUtils.createIdentityStoreFromFile("/home/kxie/Desktop/identity512.p12");
-            KeyStore trustStore2 = TLSUtils.createTrustStoreFromFile("/home/kxie/Desktop/trust512.p12");
+            TLSUtils.saveIdentityStoreToFile(identityStore, IDENTITY_STORE);
+            TLSUtils.saveTrustStoreToFile(trustStore, TRUST_STORE);
+            KeyStore identityStore2 = TLSUtils.createIdentityStoreFromFile(IDENTITY_STORE);
+            KeyStore trustStore2 = TLSUtils.createTrustStoreFromFile(TRUST_STORE);
             System.out.println(identityStore2.equals(identityStore));
             System.out.println(trustStore2.equals(trustStore));
-            TLSUtils.saveIdentityStoreToFile(identityStore2, "/home/kxie/Desktop/identity5122.p12");
-            TLSUtils.saveTrustStoreToFile(trustStore2, "/home/kxie/Desktop/trust5122.p12");
+            TLSUtils.saveIdentityStoreToFile(identityStore2, DESKTOP_DIR + "identity5122.p12");
+            TLSUtils.saveTrustStoreToFile(trustStore2, DESKTOP_DIR + "trust5122.p12");
             System.out.println("Good!");
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        Security.addProvider(new BouncyCastleProvider());
-        Security.addProvider(new BouncyCastleJsseProvider());
+        }*/
         KeyStore serverStore = null;
         try {
-            serverStore = TLSUtils.createIdentityStoreFromFile("/home/kxie/Desktop/identity512.p12");
+            serverStore = TLSUtils.createIdentityStoreFromFile(IDENTITY_STORE);
         } catch (Exception e) {
             System.out.println("Fails to read identity");
             e.printStackTrace();
@@ -77,7 +82,7 @@ public class TLSServer {
 
             SSLServerSocketFactory fact = sslContext.getServerSocketFactory();
             SSLServerSocket sSock =
-                (SSLServerSocket)fact.createServerSocket(8080);
+                (SSLServerSocket)fact.createServerSocket(4443);
             sSock.setEnabledProtocols(protocols);
             sSock.setEnabledCipherSuites(cipher_suites);
 

@@ -1,5 +1,6 @@
 package com.goodstartsoft.pqc;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -29,12 +30,16 @@ public class TLSClient
             "TLS_AES_256_GCM_SHA384"};
     private final KeyStore trustStore_;
 
+    static public String DESKTOP_DIR = System.getProperty("user.home") + File.separator + "Desktop/";
+    static public String IDENTITY_STORE = DESKTOP_DIR + "identity512.p12";
+    static public String TRUST_STORE = DESKTOP_DIR + "trust512.p12";
+
     public static void main(String[] args) {
         Security.addProvider(new BouncyCastleProvider());
         Security.addProvider(new BouncyCastleJsseProvider());
         KeyStore trustStore = null;
         try {
-            trustStore = TLSUtils.createTrustStoreFromFile("/home/kxie/Desktop/trust512.p12");
+            trustStore = TLSUtils.createTrustStoreFromFile(TRUST_STORE);
         } catch (Exception e) {
             System.out.println("Fails to read trust store");
             e.printStackTrace();
@@ -67,7 +72,7 @@ public class TLSClient
             sslContext.init(null, trustMgrFact.getTrustManagers(), null);
 
             SSLSocketFactory fact = sslContext.getSocketFactory();
-            SSLSocket cSock = (SSLSocket)fact.createSocket("localhost", 8080);
+            SSLSocket cSock = (SSLSocket)fact.createSocket("localhost", 4443);
             cSock.setEnabledProtocols(protocols);
             cSock.setEnabledCipherSuites(cipher_suites);
 
