@@ -1,0 +1,40 @@
+1. Run Java TLSServer to generate identity and trust store
+
+dell2@Mosca-group-dell2:~/bouncycastle-pqc/oqs-bouncycastle/javapqc$ more run-tls-server.sh 
+#java -Djava.util.logging.config.file=logging.properties -Djdk.tls.namedGroups=p521_kyber1024 -cp target/javapqc-0.0.1-SNAPSHOT.jar:../../lib172b0
+6/* com.goodstartsoft.pqc.TLSServer
+#java -Djava.util.logging.config.file=logging.properties -Djdk.tls.namedGroups=secp256r1 -cp target/javapqc-0.0.1-SNAPSHOT.jar:../../lib/* com.goo
+dstartsoft.pqc.TLSServer
+#java -Djava.util.logging.config.file=logging.properties -cp target/javapqc-0.0.1-SNAPSHOT.jar:../../lib/* com.goodstartsoft.pqc.TLSServer
+java -Djava.util.logging.config.file=logging.properties -Djdk.tls.namedGroups=P521_MLKEM1024 -cp target/javapqc-0.0.1-SNAPSHOT.jar:../../lib/* com
+.goodstartsoft.pqc.TLSServer
+
+The identity and trust store are saved at ~/Desktop/identity512.p12, ~/Desktop/trust.p12, password 123456
+
+2. Convert PKCS12 format to PEM with OpenSSL
+
+openssl pkcs12 -in ~/Desktop/identity512.p12 -out ~/Desktop/cert512.pem -clcerts -nokeys
+
+openssl pkcs12 -in ~/Desktop/identity512.p12 -out ~/Desktop/private512.pem -nodes -nocerts
+
+3. Inter-operation test
+
+3.1 OQSProvider/OpenSSL 3 client, JAVA BouncyCastle server
+
+3.1.1 Run TLS server
+
+
+dell2@Mosca-group-dell2:~/bouncycastle-pqc/oqs-bouncycastle/javapqc$ ./run-tls-server.sh ./run-tls-server.sh
+
+3.1.2 cd ssl3, run OQSProvider/OpenSSL 3 client
+
+oqs-provider/.local/bin/openssl s_client -provider default -provider-path oqs-provider/_build/lib -provider oqsprovider -cert ~/Desktop/cert512.pem -key ~/Desktop/private512.pem -groups p521_mlkem1024 -tls1_3 127.0.0.1:4443
+
+3.2 OQSProvider/OpenSSL 3 server, JAVA BouncyCastle client
+
+3.2.1
+dell2@Mosca-group-dell2:~/ssl3$ oqs-provider/.local/bin/openssl s_server -provider default -provider-path oqs-provider/_build/lib -provider oqsprovider -cert ~/Desktop/cert512.pem -key ~/Desktop/private512.pem -groups p521_mlkem1024 -tls1_3
+
+3.2.2 Run TLS client
+
+dell2@Mosca-group-dell2:~/bouncycastle-pqc/oqs-bouncycastle/javapqc$ ./run-tls-client.sh

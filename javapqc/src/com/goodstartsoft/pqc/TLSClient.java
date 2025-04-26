@@ -72,7 +72,7 @@ public class TLSClient
             sslContext.init(null, trustMgrFact.getTrustManagers(), null);
 
             SSLSocketFactory fact = sslContext.getSocketFactory();
-            SSLSocket cSock = (SSLSocket)fact.createSocket("localhost", 4443);
+            SSLSocket cSock = (SSLSocket)fact.createSocket("127.0.0.1", 4433);
             cSock.setEnabledProtocols(protocols);
             cSock.setEnabledCipherSuites(cipher_suites);
 
